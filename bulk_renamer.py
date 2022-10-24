@@ -1,10 +1,11 @@
-import os
-import sys
+import os # used to loop through folder and rename files
+import sys # used for arguments
 
 # NOTE
 # in .bashrc add
 # alias bulk_renamer='sudo python3 <path to .py script> "$PWD"'
 
+# the directory this script is working on
 DIR = ""
 # extensions of files we want to rename
 EXTENSIONS = ['.mp4', '.mkv', '.mov', '.avi']
@@ -21,7 +22,12 @@ class to_change():
         self.ext = ext
 
 def replace_str(old, new):
-    """
+    """ Replaces the old string with the new string
+
+
+    Parameters :
+    old -- string to be replaced
+    new -- string that replaces old
     """
     for elem in files.values():
         temp = elem.new[-1]
@@ -32,6 +38,8 @@ def replace_str(old, new):
 
 
 def remove_from_end(n):
+    """Removes the last n chars (excluding the extension) from the files in files{}
+    """
     for elem in files.values():
         temp = elem.new[-1]
         # removes last n characters from string except for the extension
@@ -39,6 +47,8 @@ def remove_from_end(n):
 
 
 def remove_from_front(n):
+    """ Removes the first n chars from the files in files{}
+    """
     for elem in files.values():
         temp = elem.new[-1]
         # removes first n characters from string
@@ -152,14 +162,18 @@ def loop():
 
 
 def main():
+    """Main function
+    """
     if len(sys.argv) < 2:
         print("No Directory given in argument")
         exit()
+    
 
     global DIR
+    # 1st argument is the directory this script works on
     DIR = sys.argv[1]
 
-
+    # addes files to files{}
     for filename in os.listdir(DIR):
         f = os.path.join(DIR, filename)
         # checking if it is a file

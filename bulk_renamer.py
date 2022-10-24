@@ -57,7 +57,7 @@ def remove_from_front(n):
 def print_current():
     """Prints what the files will be renamed to if rename_files() is called
     """
-    print("-------Current Iteration of Renaming-------")
+    print("-------Current Iteration of Changes-------")
     for elem in files.values():
         print(elem.new[-1])
 

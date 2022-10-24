@@ -1,12 +1,6 @@
 ### bulk_renamer
 
-Python script to rename multiple files in a folder
-
-## Getting Started
-
-- python bulk_renamer.py PATH_TO_DIRECTORY
-- PATH_TO_DIRECTORY should be the absolute path to the directory you want to rename files inside of
-- NOTE : you might need to do <b>sudo python...</b> if you get a permission error
+Python script to rename multiple files in a folder.
 
 
 ## Installation
@@ -14,6 +8,20 @@ Python script to rename multiple files in a folder
 1. Clone the repo
 ```sh
 git clone https://github.com/nolanwinsman/bulk_renamer.git
+```
+
+## Getting Started
+
+```sh
+python bulk_renamer.py PATH_TO_DIRECTORY
+```
+- PATH_TO_DIRECTORY should be the absolute path to the directory you want to rename files inside of
+- NOTE : you might need to do <b>sudo python...</b> if you get a permission error
+- By default the script only works on video files ['.mp4', '.mkv', '.mov', '.avi']
+If you want to use different file extensions, for example <b>.jpg</b> and <b>.png</b> instead, you can either change the global variable EXTENSIONS to <b>EXTENSIONS = ['.jpg', '.png']</b> at the top of bulk_renamer.py
+or use the the CLI arguments 2 to n
+```sh
+python bulk_renamer.py PATH_TO_DIRECTORY .jpg .png
 ```
 
 ## Features

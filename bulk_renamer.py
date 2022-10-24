@@ -196,6 +196,8 @@ def main():
     if len(files) > 0:
         print()
         loop()
+    else:
+        print(f"No files with extension {EXTENSIONS} found\nPick a new directory or read the README.md for how to change which extensions are used")
 
 if __name__ == "__main__":
     main()

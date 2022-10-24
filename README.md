@@ -31,7 +31,7 @@ python bulk_renamer.py PATH_TO_DIRECTORY .jpg .png
 - end n     : removes the last n chars from the file excluding extension
 - cleanup   : applies common fixes such as removes periods and replacing double spaces with single spaces
 - undo      : un does the last change applies
-- rename    : final command to applies changes. No files are renamed until this command is input
+- rename    : <b>FINAL</b> command to applies changes. No files are renamed until this command is input
 - exit      : exits the program  
 
 # Contact

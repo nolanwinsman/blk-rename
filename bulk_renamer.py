@@ -7,7 +7,9 @@ import sys # used for arguments
 
 # the directory this script is working on
 DIR = ""
+
 # extensions of files we want to rename
+# changes this or use the arguments to use different file extensions
 EXTENSIONS = ['.mp4', '.mkv', '.mov', '.avi']
 files = {}
 
@@ -164,9 +166,18 @@ def loop():
 def main():
     """Main function
     """
+
     if len(sys.argv) < 2:
         print("No Directory given in argument")
         exit()
+
+    # arguments 2 through n are the file extensions the script will use
+    if len(sys.argv) >= 3:
+        global EXTENSIONS
+        EXTENSIONS = []
+        for i in range(2, len(sys.argv)):
+            EXTENSIONS.append(sys.argv[i])
+
     
 
     global DIR
@@ -185,11 +196,6 @@ def main():
     if len(files) > 0:
         print()
         loop()
-
-
-
-
-
 
 if __name__ == "__main__":
     main()

@@ -2,6 +2,7 @@ import os # used to loop through folder and rename files
 import sys # used for arguments
 import shlex # used to get arguments from input()
 import os # used to clear the screen
+import re
 
 # NOTE
 # in .bashrc add
@@ -40,6 +41,32 @@ def replace_str(old, new):
         temp = f"{temp}{elem.ext}" # adds back the extension
         elem.new.append(temp)
 
+def range_replace(min_r, max_r, old, new):
+    print("made it to func")
+    min_r, max_r = int(min_r), int(max_r)
+
+    # if the min value is greater than the max value, swaps the values
+    if min_r > max_r:
+        min_r, max_r = max_r, min_r
+
+    for elem in files.values():
+        temp = elem.new[-1]
+        try:
+            num = int(re.search(r'\d+', temp).group()) # attempts to find a number
+        except Exception as e:
+            print(f"Exception {e} occured")
+            continue
+
+        if num >= min_r and num <= max_r:
+            temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
+            temp = temp.replace(old, new) # replaces old string with new string
+            print(f"if statement temp: \n{temp}\nNEW: {new}")
+            temp = f"{temp}{elem.ext}" # adds back the extension
+            elem.new.append(temp)
+        else:
+            elem.new.append(elem.new[-1])
+
+
 
 def remove_from_end(n):
     """Removes the last n chars (excluding the extension) from the files in files{}
@@ -48,6 +75,14 @@ def remove_from_end(n):
         temp = elem.new[-1]
         # removes last n characters from string except for the extension
         elem.new.append(f"{temp[:len(temp) - (n + len(elem.ext))]}{elem.ext}")
+
+def remove_from_middle(left, right):
+    print(f"Left {left} Right {right}")
+    for elem in files.values():
+        temp = elem.new[-1]
+        temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
+        elem.new.append(f"{temp[:left]}{temp[right:]}{elem.ext}")
+
 
 
 def remove_from_front(n):
@@ -59,7 +94,8 @@ def remove_from_front(n):
         elem.new.append(f"{temp[n:]}")
 
 def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    return
+    # os.system('cls' if os.name == 'nt' else 'clear')
 
 def print_current():
     """Prints what the files will be renamed to if rename_files() is called
@@ -90,11 +126,12 @@ def rename_files():
     exit()
 
 def cleanup():
-    """Replaces double spaces with single spaces
+    """Replaces double spaces with single spaces 5 times
        Removes all periods except extension period
     """
     replace_str(".", "")
-    replace_str("  ", " ")
+    for i in range(5):
+        replace_str("  ", " ")
 
 
 def get_option(resp):
@@ -105,6 +142,9 @@ def get_option(resp):
     """
 
     splt = shlex.split(resp) # arguments split
+    if len(splt) < 1:
+        print("Not enough arguments given")
+        return
     resp_lower = resp.lower()
 
     if "replace" in resp_lower:
@@ -117,9 +157,21 @@ def get_option(resp):
             new = splt[2]
         old = splt[1]
         replace_str(old, new)
+        
+    elif "range" in resp_lower:
+        if len(splt) <= 3:
+            print("Not enough arguments for range_replace utility")
+            return
+        elif len(splt) == 4:
+            new = ""
+        elif len(splt) >= 5:
+            new = splt[4]
+        old = splt[3]
+        min_r, max_r = splt[1], splt[2]
+        range_replace(min_r, max_r , old, new)
 
     elif "front" in resp_lower:
-        if len(splt) <= 1:
+        if len(splt) < 2:
             print("Not enough arguments for front utility")
             return
         try:
@@ -129,8 +181,21 @@ def get_option(resp):
             return
         remove_from_front(n)
 
+    elif "mid" in resp_lower:
+        if len(splt) < 3:
+            print("Not enough arguments for mid utility")
+            return
+        try:
+            left = int(splt[1])
+            right = int(splt[2])
+        except ValueError:
+            print("Not valid integer arguments")
+            
+        remove_from_middle(left, right)
+
+
     elif "end" in resp_lower:
-        if len(splt) <= 1:
+        if len(splt) < 2:
             print("Not enough arguments for end utility")
             return
         try:
@@ -165,13 +230,15 @@ def loop():
     while True:
         print_current()
         print("\n\nInput Commands\n---------------------")
-        print("replace str_old str_new\t: takes in two strings and replaces all occurences of the old string with the new string")
-        print("front n\t\t\t: removes the first n chars from the file")
-        print("end n\t\t\t: removes the last n chars from the file")
-        print("cleanup\t\t\t: applies common fixes. Read documentation for specifics")
-        print("undo\t\t\t: un applies your last change")
-        print("rename\t\t\t: applies all the changes to the actual files. DO NOT input this unless you are ready to rename said files")
-        print("exit\t\t\t: exits the program\n")
+        print("replace str_old str_new\t\t: takes in two strings and replaces all occurences of the old string with the new string")
+        print("range min max str_old str_new\t: takes in...TODO ")
+        print("front n\t\t\t\t: removes the first n chars from the file")
+        print("mid left right\t\t\t\t: removes the chars the left index to the right index the file")
+        print("end n\t\t\t\t: removes the last n chars from the file")
+        print("cleanup\t\t\t\t: applies common fixes. Read documentation for specifics")
+        print("undo\t\t\t\t: un applies your last change")
+        print("rename\t\t\t\t: applies all the changes to the actual files. DO NOT input this unless you are ready to rename said files")
+        print("exit\t\t\t\t: exits the program\n")
         get_option(input())
 
 

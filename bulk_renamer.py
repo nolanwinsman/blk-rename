@@ -1,5 +1,7 @@
 import os # used to loop through folder and rename files
 import sys # used for arguments
+import shlex # used to get arguments from input()
+import os # used to clear the screen
 
 # NOTE
 # in .bashrc add
@@ -56,10 +58,15 @@ def remove_from_front(n):
         # removes first n characters from string
         elem.new.append(f"{temp[n:]}")
 
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 def print_current():
     """Prints what the files will be renamed to if rename_files() is called
     """
-    print("-------Current Iteration of Changes-------")
+    clear_screen()
+    text = "Current Iteration of Changes"
+    print(f'{text:-^10}')
     for elem in files.values():
         print(elem.new[-1])
 
@@ -96,50 +103,57 @@ def get_option(resp):
        Parameter:
        resp -- string of the users input
     """
-    if "replace" in resp.lower():
-        args = resp.split()
-        old = args[1]
-        if 3 > len(args):
+
+    splt = shlex.split(resp) # arguments split
+    resp_lower = resp.lower()
+
+    if "replace" in resp_lower:
+        if len(splt) <= 1:
+            print("Not enough arguments for replace utility")
+            return
+        elif len(splt) == 2:
             new = ""
-        else:
-            new = args[2]
-        if new == "space":
-            new = " "
+        elif len(splt) >= 3:
+            new = splt[2]
+        old = splt[1]
         replace_str(old, new)
 
-    elif "front" in resp.lower():
-        args = resp.split()
+    elif "front" in resp_lower:
+        if len(splt) <= 1:
+            print("Not enough arguments for front utility")
+            return
         try:
-            n = int(args[1])
+            n = int(splt[1])
         except ValueError:
-            print(f"{args[1]} is not a valid integer argument")
+            print(f"{splt[1]} is not a valid integer argument")
             return
         remove_from_front(n)
 
-    elif "end" in resp.lower():
-        args = resp.split()
+    elif "end" in resp_lower:
+        if len(splt) <= 1:
+            print("Not enough arguments for end utility")
+            return
         try:
-            n = int(args[1])
+            n = int(splt[1])
         except ValueError:
-            print(f"{args[1]} is not a valid integer argument")
+            print(f"{splt[1]} is not a valid integer argument")
             return
         remove_from_end(n)
 
-    elif "cleanup" in resp.lower():
+    elif "cleanup" in resp_lower:
         cleanup()
 
-    elif "undo" in resp.lower():
+    elif "undo" in resp_lower:
         undo()
 
-    elif "rename" in resp.lower():
+    elif "rename" in resp_lower:
         rename_files()
 
-    elif "exit" in resp.lower():
+    elif "exit" in resp_lower:
         exit()
         return
 
-    else:
-        return
+    return
 
 
 

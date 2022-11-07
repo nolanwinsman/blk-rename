@@ -3,10 +3,16 @@ import sys # used for arguments
 import shlex # used to get arguments from input()
 import os # used to clear the screen
 import re
+import readline # including this package allows y
 
 # NOTE
 # in .bashrc add
 # alias bulk_renamer='sudo python3 <path to .py script> "$PWD"'
+
+# TODO
+# comments
+# README.md new utilities
+# log file to remember steps to auto rename files
 
 # the directory this script is working on
 DIR = ""
@@ -17,7 +23,7 @@ EXTENSIONS = ['.mp4', '.mkv', '.mov', '.avi']
 files = {}
 
 
-class to_change():
+class file_struct():
     """Struct to organize the files the script will rename
     """
     def __init__(self, original, path, ext):
@@ -48,6 +54,10 @@ def range_replace(min_r, max_r, old, new):
     # if the min value is greater than the max value, swaps the values
     if min_r > max_r:
         min_r, max_r = max_r, min_r
+
+    if min_r < 0 or max_r < 0:
+        print("Invalid arguments")
+        return
 
     for elem in files.values():
         temp = elem.new[-1]
@@ -94,15 +104,13 @@ def remove_from_front(n):
         elem.new.append(f"{temp[n:]}")
 
 def clear_screen():
-    return
-    # os.system('cls' if os.name == 'nt' else 'clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 def print_current():
     """Prints what the files will be renamed to if rename_files() is called
     """
     clear_screen()
-    text = "Current Iteration of Changes"
-    print(f'{text:-^10}')
+    text = "-----Current Iteration of Changes-----"
     for elem in files.values():
         print(elem.new[-1])
 
@@ -272,7 +280,7 @@ def main():
         for ext in EXTENSIONS:
             if f.endswith(ext):
                 # print(filename)
-                files[filename] = to_change(filename, DIR, ext)
+                files[filename] = file_struct(filename, DIR, ext)
 
     if len(files) > 0:
         print()

@@ -22,6 +22,8 @@ DIR = ""
 EXTENSIONS = ['.mp4', '.mkv', '.mov', '.avi']
 files = {}
 
+HIDE = False
+
 
 class file_struct():
     """Struct to organize the files the script will rename
@@ -110,7 +112,7 @@ def print_current():
     """Prints what the files will be renamed to if rename_files() is called
     """
     clear_screen()
-    text = "-----Current Iteration of Changes-----"
+    print("-----Current Iteration of Changes-----")
     for elem in files.values():
         print(elem.new[-1])
 
@@ -130,7 +132,6 @@ def rename_files():
         old = os.path.join(elem.path, elem.original)
         new = os.path.join(elem.path, elem.new[-1])
         os.rename(old, new)
-        # shutil.move(old, new)
     exit()
 
 def cleanup():
@@ -154,8 +155,9 @@ def get_option(resp):
         print("Not enough arguments given")
         return
     resp_lower = resp.lower()
-
-    if "replace" in resp_lower:
+    first_arg = splt[0].lower()
+    print(first_arg)
+    if first_arg == "replace":
         if len(splt) <= 1:
             print("Not enough arguments for replace utility")
             return
@@ -166,7 +168,7 @@ def get_option(resp):
         old = splt[1]
         replace_str(old, new)
         
-    elif "range" in resp_lower:
+    elif first_arg == "range":
         if len(splt) <= 3:
             print("Not enough arguments for range_replace utility")
             return
@@ -178,7 +180,7 @@ def get_option(resp):
         min_r, max_r = splt[1], splt[2]
         range_replace(min_r, max_r , old, new)
 
-    elif "front" in resp_lower:
+    elif first_arg == "front":
         if len(splt) < 2:
             print("Not enough arguments for front utility")
             return
@@ -189,7 +191,7 @@ def get_option(resp):
             return
         remove_from_front(n)
 
-    elif "mid" in resp_lower:
+    elif first_arg == "mid":
         if len(splt) < 3:
             print("Not enough arguments for mid utility")
             return
@@ -202,7 +204,7 @@ def get_option(resp):
         remove_from_middle(left, right)
 
 
-    elif "end" in resp_lower:
+    elif first_arg == "end":
         if len(splt) < 2:
             print("Not enough arguments for end utility")
             return
@@ -213,18 +215,21 @@ def get_option(resp):
             return
         remove_from_end(n)
 
-    elif "cleanup" in resp_lower:
+    elif first_arg == "cleanup":
         cleanup()
 
-    elif "undo" in resp_lower:
+    elif first_arg == "undo":
         undo()
+    
+    elif first_arg == "hide":
+        global HIDE
+        HIDE = not HIDE # flips the value of hide
 
-    elif "rename" in resp_lower:
+    elif first_arg == "rename":
         rename_files()
 
-    elif "exit" in resp_lower:
+    elif first_arg == "exit":
         exit()
-        return
 
     return
 
@@ -237,16 +242,20 @@ def loop():
     """
     while True:
         print_current()
-        print("\n\nInput Commands\n---------------------")
-        print("replace str_old str_new\t\t: takes in two strings and replaces all occurences of the old string with the new string")
-        print("range min max str_old str_new\t: takes in...TODO ")
-        print("front n\t\t\t\t: removes the first n chars from the file")
-        print("mid left right\t\t\t\t: removes the chars the left index to the right index the file")
-        print("end n\t\t\t\t: removes the last n chars from the file")
-        print("cleanup\t\t\t\t: applies common fixes. Read documentation for specifics")
-        print("undo\t\t\t\t: un applies your last change")
-        print("rename\t\t\t\t: applies all the changes to the actual files. DO NOT input this unless you are ready to rename said files")
-        print("exit\t\t\t\t: exits the program\n")
+        if not HIDE:
+            print("\n\nInput Commands\n---------------------")
+            print("replace str_old str_new\t\t: takes in two strings and replaces all occurences of the old string with the new string")
+            print("range min max str_old str_new\t: replace utility but only works on a range of numbers. See README.md for more details")
+            print("front n\t\t\t\t: removes the first n chars from the file")
+            print("mid left right\t\t\t: removes the chars the left index to the right index the file")
+            print("end n\t\t\t\t: removes the last n chars from the file")
+            print("cleanup\t\t\t\t: applies common fixes. Read documentation for specifics")
+            print("undo\t\t\t\t: un applies your last change")
+            print("hide\t\t\t\t: toggles if this list of commands should be shown")
+            print("rename\t\t\t\t: applies all the changes to the actual files. DO NOT input this unless you are ready to rename said files")
+            print("exit\t\t\t\t: exits the program\n")
+        else:
+            print("Input your Command\n---------------------")
         get_option(input())
 
 

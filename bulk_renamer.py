@@ -119,7 +119,7 @@ def print_current():
 
 
 def insert_text(position, text):
-    for elem in files.values()
+    for elem in files.values():
        temp = elem.new[-1]
        temp = temp.replace(elem.ext, "") # removes the extension so that the insert will not affect it
        elem.new.append(f"{temp[:position]}{text}{temp[position:]}{elem.ext}")

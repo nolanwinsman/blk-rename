@@ -116,6 +116,14 @@ def print_current():
     for elem in files.values():
         print(elem.new[-1])
 
+
+def insert_text(position, text):
+    for elem in files.values()
+       temp = elem.new[-1]
+       temp = temp.replace(elem.ext, "") # removes the extension so that the insert will not affect it
+       elem.new.append(f"{temp[:position]}{text}{temp[position:]}{elem.ext}")
+
+
 def undo():
     """ Redacts the last change the user input in loop()
     """
@@ -200,6 +208,7 @@ def get_option(resp):
             right = int(splt[2])
         except ValueError:
             print("Not valid integer arguments")
+            return
             
         remove_from_middle(left, right)
 
@@ -214,6 +223,18 @@ def get_option(resp):
             print(f"{splt[1]} is not a valid integer argument")
             return
         remove_from_end(n)
+
+    elif first_arg == "insert":
+        if len(splt) < 3:
+            print("Not enough arguments for insert utility")
+            return
+        try:
+            position = int(splt[1])
+        except ValueError:
+            print("Not valid integer argument")
+            return
+        text = splt[2]
+        insert_text(position, text)
 
     elif first_arg == "cleanup":
         cleanup()

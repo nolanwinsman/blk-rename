@@ -122,7 +122,11 @@ def insert_text(position, text):
     for elem in files.values():
        temp = elem.new[-1]
        temp = temp.replace(elem.ext, "") # removes the extension so that the insert will not affect it
-       elem.new.append(f"{temp[:position]}{text}{temp[position:]}{elem.ext}")
+       # edge case to add text to the end
+        if position <= -1:
+            elem.new.append(f"{temp}{text}{elem.ext}")
+        else:
+            elem.new.append(f"{temp[:position]}{text}{temp[position:]}{elem.ext}")
 
 
 def undo():
@@ -271,7 +275,7 @@ def loop():
             print("front n\t\t\t\t: removes the first n chars from the file")
             print("mid left right\t\t\t: removes the chars the left index to the right index the file")
             print("end n\t\t\t\t: removes the last n chars from the file")
-            print("insert n text\t\t\t\t: inserts text at position n")
+            print("insert n text\t\t\t: inserts text at position n")
             print("cleanup\t\t\t\t: applies common fixes. Read documentation for specifics")
             print("undo\t\t\t\t: un applies your last change")
             print("hide\t\t\t\t: toggles if this list of commands should be shown")

@@ -271,6 +271,7 @@ def loop():
             print("front n\t\t\t\t: removes the first n chars from the file")
             print("mid left right\t\t\t: removes the chars the left index to the right index the file")
             print("end n\t\t\t\t: removes the last n chars from the file")
+            print("insert n text\t\t\t\t: inserts text at position n")
             print("cleanup\t\t\t\t: applies common fixes. Read documentation for specifics")
             print("undo\t\t\t\t: un applies your last change")
             print("hide\t\t\t\t: toggles if this list of commands should be shown")

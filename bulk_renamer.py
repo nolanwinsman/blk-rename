@@ -12,7 +12,8 @@ import readline # including this package allows y
 # TODO
 # comments
 # README.md new utilities
-# log file to remember steps to auto rename files
+# append function
+# insert function
 
 # the directory this script is working on
 DIR = ""

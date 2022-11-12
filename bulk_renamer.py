@@ -2,7 +2,7 @@ import os # used to loop through folder and rename files
 import sys # used for arguments
 import shlex # used to get arguments from input()
 import os # used to clear the screen
-import re
+import re # regex
 import readline # including this package allows y
 
 # NOTE
@@ -136,6 +136,12 @@ def undo():
         if len(elem.new) > 1:
             elem.new.pop()
 
+def remove_files(pattern):
+    temp = files # copy of files
+    for key in temp:
+        if pattern in temp[key]:
+            del files[key]
+
 def rename_files():
     """Applies all the changes the user has input in loop() to the files
        Once this is called, the changes are final.
@@ -251,6 +257,14 @@ def get_option(resp):
         global HIDE
         HIDE = not HIDE # flips the value of hide
 
+    elif first_arg == "remove"
+       if len(splt) < 2:
+           print("Not enough arguments given for remove utility")
+           return
+       pattern = splt[1]
+       remove_files(pattern)
+
+
     elif first_arg == "rename":
         rename_files()
 
@@ -279,6 +293,7 @@ def loop():
             print("cleanup\t\t\t\t: applies common fixes. Read documentation for specifics")
             print("undo\t\t\t\t: un applies your last change")
             print("hide\t\t\t\t: toggles if this list of commands should be shown")
+            print("remove text\t\t\t\t: removes all files that follow the format of text")
             print("rename\t\t\t\t: applies all the changes to the actual files. DO NOT input this unless you are ready to rename said files")
             print("exit\t\t\t\t: exits the program\n")
         else:

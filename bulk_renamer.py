@@ -112,22 +112,20 @@ def clear_screen():
 def print_current():
     """Prints what the files will be renamed to if rename_files() is called
     """
-    clear_screen()
+    # clear_screen()
     print("-----Current Iteration of Changes-----")
     for elem in files.values():
         print(elem.new[-1])
 
-
 def insert_text(position, text):
     for elem in files.values():
-       temp = elem.new[-1]
-       temp = temp.replace(elem.ext, "") # removes the extension so that the insert will not affect it
-       # edge case to add text to the end
+        temp = elem.new[-1]
+        temp = temp.replace(elem.ext, "") # removes the extension so that the insert will not affect it
+        # edge case to add text to the end
         if position <= -1:
             elem.new.append(f"{temp}{text}{elem.ext}")
         else:
             elem.new.append(f"{temp[:position]}{text}{temp[position:]}{elem.ext}")
-
 
 def undo():
     """ Redacts the last change the user input in loop()
@@ -137,10 +135,14 @@ def undo():
             elem.new.pop()
 
 def remove_files(pattern):
-    temp = files # copy of files
-    for key in temp:
-        if pattern in temp[key]:
-            del files[key]
+    to_remove = []
+    for key in files:
+        if pattern in files[key].new[-1]:
+            print(f"Deleting {key}")
+            to_remove.append(key)
+
+    for key in to_remove:
+        del files[key]
 
 def rename_files():
     """Applies all the changes the user has input in loop() to the files
@@ -257,13 +259,12 @@ def get_option(resp):
         global HIDE
         HIDE = not HIDE # flips the value of hide
 
-    elif first_arg == "remove"
-       if len(splt) < 2:
-           print("Not enough arguments given for remove utility")
-           return
-       pattern = splt[1]
-       remove_files(pattern)
-
+    elif first_arg == "remove":
+        if len(splt) < 2:
+            print("Not enough arguments given for remove utility")
+            return
+        pattern = splt[1]
+        remove_files(pattern)
 
     elif first_arg == "rename":
         rename_files()
@@ -272,7 +273,6 @@ def get_option(resp):
         exit()
 
     return
-
 
 
 
@@ -293,8 +293,8 @@ def loop():
             print("cleanup\t\t\t\t: applies common fixes. Read documentation for specifics")
             print("undo\t\t\t\t: un applies your last change")
             print("hide\t\t\t\t: toggles if this list of commands should be shown")
-            print("remove text\t\t\t\t: removes all files that follow the format of text")
-            print("rename\t\t\t\t: applies all the changes to the actual files. DO NOT input this unless you are ready to rename said files")
+            print("remove text\t\t\t: removes all files that follow the format of text")
+            print("rename\t\t\t\t: applies all the changes to the actual files")
             print("exit\t\t\t\t: exits the program\n")
         else:
             print("Input your Command\n---------------------")

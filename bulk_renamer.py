@@ -21,6 +21,7 @@ DIR = ""
 # extensions of files we want to rename
 # changes this or use the arguments to use different file extensions
 EXTENSIONS = ['.mp4', '.mkv', '.mov', '.avi']
+ALL_FILES = False # boolean for if every file in DIR should be added to dictionary files
 files = {}
 
 
@@ -33,24 +34,23 @@ class file_struct():
     def __init__(self, original, path, ext):
         self.original = original
         self.path = path
-        self.new = [original] # stack of changes
+        self.new = [original]
         self.ext = ext
-        self.display = True
+        self.display = [True]
 
 def replace_str(old, new):
     """ Replaces the old string with the new string
-
 
     Parameters :
     old -- string to be replaced
     new -- string that replaces old
     """
-    for elem in files.values():
+    for key, elem in files.items():
         temp = elem.new[-1]
         temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
         temp = temp.replace(old, new) # replaces old string with new string
         temp = f"{temp}{elem.ext}" # adds back the extension
-        elem.new.append(temp)
+        add_new(key, temp)
 
 def range_replace(min_r, max_r, old, new):
     print("made it to func")
@@ -64,7 +64,7 @@ def range_replace(min_r, max_r, old, new):
         print("Invalid arguments")
         return
 
-    for elem in files.values():
+    for key, elem in files.items():
         temp = elem.new[-1]
         try:
             num = int(re.search(r'\d+', temp).group()) # attempts to find a number
@@ -77,36 +77,35 @@ def range_replace(min_r, max_r, old, new):
             temp = temp.replace(old, new) # replaces old string with new string
             print(f"if statement temp: \n{temp}\nNEW: {new}")
             temp = f"{temp}{elem.ext}" # adds back the extension
-            elem.new.append(temp)
+            add_new(key, temp)
         else:
-            elem.new.append(elem.new[-1])
-
-
+            add_new(key, elem.new[-1])
 
 def remove_from_end(n):
     """Removes the last n chars (excluding the extension) from the files in files{}
     """
-    for elem in files.values():
+    for key, elem in files.items():
         temp = elem.new[-1]
+        print(f"EXT\t{elem.ext}")
         # removes last n characters from string except for the extension
-        elem.new.append(f"{temp[:len(temp) - (n + len(elem.ext))]}{elem.ext}")
+        temp = temp.replace(elem.ext, "")
+        length = len(temp) - n
+        add_new(key, f"{temp[:length]}{elem.ext}")
 
 def remove_from_middle(left, right):
-    print(f"Left {left} Right {right}")
-    for elem in files.values():
+    for key, elem in files.items():
         temp = elem.new[-1]
         temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
-        elem.new.append(f"{temp[:left]}{temp[right:]}{elem.ext}")
-
-
+        add_new(key, f"{temp[:left]}{temp[right:]}{elem.ext}")
 
 def remove_from_front(n):
     """ Removes the first n chars from the files in files{}
     """
-    for elem in files.values():
+    for key, elem in files.items():
         temp = elem.new[-1]
+        temp = temp.replace(elem.ext, "")
         # removes first n characters from string
-        elem.new.append(f"{temp[n:]}")
+        add_new(key, f"{temp[n:]}{elem.ext}")
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -117,42 +116,62 @@ def print_current():
     # clear_screen()
     print("-----Current Iteration of Changes-----")
     for elem in files.values():
-        if elem.display:
+        if elem.display[-1]:
             print(elem.new[-1])
 
 def insert_text(position, text):
-    for elem in files.values():
+    for key, elem in files.items():
         temp = elem.new[-1]
         temp = temp.replace(elem.ext, "") # removes the extension so that the insert will not affect it
         # edge case to add text to the end
         if position <= -1:
-            elem.new.append(f"{temp}{text}{elem.ext}")
+            add_new(key, f"{temp}{text}{elem.ext}")
         else:
-            elem.new.append(f"{temp[:position]}{text}{temp[position:]}{elem.ext}")
+            add_new(key, f"{temp[:position]}{text}{temp[position:]}{elem.ext}")
 
 def undo():
     """ Redacts the last change the user input in loop()
     """
     for elem in files.values():
+        assert len(elem.new) == len(elem.display)
         if len(elem.new) > 1:
             elem.new.pop()
+            elem.display.pop()
+
+def add_new(key, new_text):
+    length = len(files[key].display)
+    print(f"The new text: {new_text}")
+    if length > 1:
+        prev = files[key].display[length - 1]
+    else:
+        prev = True
+    files[key].display.append(prev)
+    files[key].new.append(new_text)
+
+def add_previous_display(key):
+    length = len(files[key].display)
+    if length > 1:
+        prev = files[key].display[length - 1]
+    else:
+        prev = True
+    files[key].display.append(prev)
 
 def remove_files(pattern):
-    to_remove = []
     for key in files:
         if pattern in files[key].new[-1]:
-            files[key].display = False 
-            to_remove.append(key)
-
-    for key in to_remove:
-        del files[key]
+            files[key].display.append(False) # manually adding false to the display list
+            files[key].new.append(files[key].new[-1])
+        else: 
+            files[key].new.append(files[key].new[-1])
+            add_previous_display(key) # calling this to make sure the previous value of display is set
 
 def rename_files():
     """Applies all the changes the user has input in loop() to the files
        Once this is called, the changes are final.
     """
     for elem in files.values():
-        if elem.display:
+        # if the top of the stack display is True
+        if elem.display[-1]:
             print(f"Renaming {elem.original} to {elem.new[-1]}")
             old = os.path.join(elem.path, elem.original)
             new = os.path.join(elem.path, elem.new[-1])
@@ -320,9 +339,13 @@ def main():
         global EXTENSIONS
         EXTENSIONS = []
         for i in range(2, len(sys.argv)):
+            print(f"ARG is {sys.argv[i]}")
+            if '*' in sys.argv[i]:
+                global ALL_FILES
+                ALL_FILES = True
+                break
             EXTENSIONS.append(sys.argv[i])
 
-    
 
     global DIR
     # 1st argument is the directory this script works on
@@ -331,11 +354,15 @@ def main():
     # addes files to files{}
     for filename in os.listdir(DIR):
         f = os.path.join(DIR, filename)
-        # checking if it is a file
-        for ext in EXTENSIONS:
-            if f.endswith(ext):
-                # print(filename)
-                files[filename] = file_struct(filename, DIR, ext)
+        # if boolean is True, we are adding every file in DIR
+        if ALL_FILES:
+            ext = os.path.splitext(filename)[1] # filename extension
+            files[filename] = file_struct(filename, DIR, ext)
+        else:
+            # checking if it is a file
+            for ext in EXTENSIONS:
+                if f.endswith(ext):
+                    files[filename] = file_struct(filename, DIR, ext)
 
     if len(files) > 0:
         print()

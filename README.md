@@ -41,6 +41,8 @@ python bulk_renamer.py PATH_TO_DIRECTORY .jpg .png
 
 ## Examples
 
+For a detailed example of how to use this program, read through [This Example](example.md) 
+
 # Contact
 
 Nolan Winsman - [@Github](https://github.com/nolanwinsman) - nolanwinsman@gmail.com

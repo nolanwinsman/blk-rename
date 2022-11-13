@@ -113,7 +113,7 @@ def clear_screen():
 def print_current():
     """Prints what the files will be renamed to if rename_files() is called
     """
-    # clear_screen()
+    clear_screen()
     print("-----Current Iteration of Changes-----")
     for elem in files.values():
         if elem.display[-1]:

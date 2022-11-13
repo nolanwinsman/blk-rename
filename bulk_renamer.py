@@ -23,6 +23,7 @@ DIR = ""
 EXTENSIONS = ['.mp4', '.mkv', '.mov', '.avi']
 files = {}
 
+
 HIDE = False
 
 
@@ -34,6 +35,7 @@ class file_struct():
         self.path = path
         self.new = [original] # stack of changes
         self.ext = ext
+        self.display = True
 
 def replace_str(old, new):
     """ Replaces the old string with the new string
@@ -115,7 +117,8 @@ def print_current():
     # clear_screen()
     print("-----Current Iteration of Changes-----")
     for elem in files.values():
-        print(elem.new[-1])
+        if elem.display:
+            print(elem.new[-1])
 
 def insert_text(position, text):
     for elem in files.values():
@@ -138,7 +141,7 @@ def remove_files(pattern):
     to_remove = []
     for key in files:
         if pattern in files[key].new[-1]:
-            print(f"Deleting {key}")
+            files[key].display = False 
             to_remove.append(key)
 
     for key in to_remove:
@@ -149,10 +152,11 @@ def rename_files():
        Once this is called, the changes are final.
     """
     for elem in files.values():
-        print(f"Renaming {elem.original} to {elem.new[-1]}")
-        old = os.path.join(elem.path, elem.original)
-        new = os.path.join(elem.path, elem.new[-1])
-        os.rename(old, new)
+        if elem.display:
+            print(f"Renaming {elem.original} to {elem.new[-1]}")
+            old = os.path.join(elem.path, elem.original)
+            new = os.path.join(elem.path, elem.new[-1])
+            os.rename(old, new)
     exit()
 
 def cleanup():

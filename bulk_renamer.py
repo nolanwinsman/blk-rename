@@ -38,24 +38,29 @@ class file_struct():
         self.ext = ext
         self.display = [True]
 
-def replace_str(old, new):
+def apply_function_all_files(fnc, *args)
+    """Loops through all the elements in files{}
+       and calls a function on them
+    """
+    for elem in files.values():
+        fnc(elem, *argv)
+
+
+def replace_str(elem, old, new):
     """ Replaces the old string with the new string
 
     Parameters :
     old -- string to be replaced
     new -- string that replaces old
     """
-    for key, elem in files.items():
-        temp = elem.new[-1]
-        temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
-        temp = temp.replace(old, new) # replaces old string with new string
-        temp = f"{temp}{elem.ext}" # adds back the extension
-        add_new(key, temp)
+    temp = elem.new[-1]
+    temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
+    temp = temp.replace(old, new) # replaces old string with new string
+    temp = f"{temp}{elem.ext}" # adds back the extension
+    add_new(elem, temp)
 
-def range_replace(min_r, max_r, old, new):
-    print("made it to func")
+def range_replace(elem, min_r, max_r, old, new):
     min_r, max_r = int(min_r), int(max_r)
-
     # if the min value is greater than the max value, swaps the values
     if min_r > max_r:
         min_r, max_r = max_r, min_r
@@ -64,48 +69,44 @@ def range_replace(min_r, max_r, old, new):
         print("Invalid arguments")
         return
 
-    for key, elem in files.items():
-        temp = elem.new[-1]
-        try:
-            num = int(re.search(r'\d+', temp).group()) # attempts to find a number
-        except Exception as e:
-            print(f"Exception {e} occured")
-            continue
+    temp = elem.new[-1]
+    try:
+        num = int(re.search(r'\d+', temp).group()) # attempts to find a number
+    except Exception as e:
+        print(f"Exception {e} occured")
+        continue
 
-        if num >= min_r and num <= max_r:
-            temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
-            temp = temp.replace(old, new) # replaces old string with new string
-            print(f"if statement temp: \n{temp}\nNEW: {new}")
-            temp = f"{temp}{elem.ext}" # adds back the extension
-            add_new(key, temp)
-        else:
-            add_new(key, elem.new[-1])
+    if num >= min_r and num <= max_r:
+        temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
+        temp = temp.replace(old, new) # replaces old string with new string
+        print(f"if statement temp: \n{temp}\nNEW: {new}")
+        temp = f"{temp}{elem.ext}" # adds back the extension
+        add_new(elem, temp)
+    else:
+        add_new(elem, elem.new[-1])
 
-def remove_from_end(n):
+def remove_from_end(elem, n):
     """Removes the last n chars (excluding the extension) from the files in files{}
     """
-    for key, elem in files.items():
-        temp = elem.new[-1]
-        print(f"EXT\t{elem.ext}")
-        # removes last n characters from string except for the extension
-        temp = temp.replace(elem.ext, "")
-        length = len(temp) - n
-        add_new(key, f"{temp[:length]}{elem.ext}")
+    temp = elem.new[-1]
+    print(f"EXT\t{elem.ext}")
+    # removes last n characters from string except for the extension
+    temp = temp.replace(elem.ext, "")
+    length = len(temp) - n
+    add_new(elem, f"{temp[:length]}{elem.ext}")
 
-def remove_from_middle(left, right):
-    for key, elem in files.items():
-        temp = elem.new[-1]
-        temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
-        add_new(key, f"{temp[:left]}{temp[right:]}{elem.ext}")
+def remove_from_middle(elem, left, right):
+    temp = elem.new[-1]
+    temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
+    add_new(elem, f"{temp[:left]}{temp[right:]}{elem.ext}")
 
-def remove_from_front(n):
+def remove_from_front(elem, n):
     """ Removes the first n chars from the files in files{}
     """
-    for key, elem in files.items():
-        temp = elem.new[-1]
-        temp = temp.replace(elem.ext, "")
-        # removes first n characters from string
-        add_new(key, f"{temp[n:]}{elem.ext}")
+    temp = elem.new[-1]
+    temp = temp.replace(elem.ext, "")
+    # removes first n characters from string
+    add_new(elem, f"{temp[n:]}{elem.ext}")
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -119,73 +120,95 @@ def print_current():
         if elem.display[-1]:
             print(elem.new[-1])
 
-def insert_text(position, text):
-    for key, elem in files.items():
-        temp = elem.new[-1]
-        temp = temp.replace(elem.ext, "") # removes the extension so that the insert will not affect it
-        # edge case to add text to the end
-        if position <= -1:
-            add_new(key, f"{temp}{text}{elem.ext}")
-        else:
-            add_new(key, f"{temp[:position]}{text}{temp[position:]}{elem.ext}")
+def insert_text(elem, position, text):
+    temp = elem.new[-1]
+    temp = temp.replace(elem.ext, "") # removes the extension so that the insert will not affect it
+    # edge case to add text to the end
+    if position <= -1:
+        add_new(elem, f"{temp}{text}{elem.ext}")
+    else:
+        add_new(elem, f"{temp[:position]}{text}{temp[position:]}{elem.ext}")
 
-def undo():
+def undo(elem):
     """ Redacts the last change the user input in loop()
     """
-    for elem in files.values():
-        assert len(elem.new) == len(elem.display)
-        if len(elem.new) > 1:
-            elem.new.pop()
-            elem.display.pop()
+    assert len(elem.new) == len(elem.display)
+    if len(elem.new) > 1:
+        elem.new.pop()
+        elem.display.pop()
 
-def add_new(key, new_text):
-    length = len(files[key].display)
+def add_new(elem, new_text):
+    length = len(elem.display)
     print(f"The new text: {new_text}")
     if length > 1:
-        prev = files[key].display[length - 1]
+        prev = elem.display[length - 1]
     else:
         prev = True
-    files[key].display.append(prev)
-    files[key].new.append(new_text)
+    elem.display.append(prev)
+    elem.new.append(new_text)
 
-def add_previous_display(key):
-    length = len(files[key].display)
+def add_previous_display(elem):
+    """Used to keep elem.display equal to what it was.
+       So if elem.display was True on edit 6, it will be true on edit 7
+       unless that edit is to change display to False
+    """
+    length = len(elem.display)
     if length > 1:
-        prev = files[key].display[length - 1]
+        prev = elem.display[length - 1]
     else:
         prev = True
-    files[key].display.append(prev)
+    elem.display.append(prev)
 
-def remove_files(pattern):
-    for key in files:
-        if pattern in files[key].new[-1]:
-            files[key].display.append(False) # manually adding false to the display list
-            files[key].new.append(files[key].new[-1])
-        else: 
-            files[key].new.append(files[key].new[-1])
-            add_previous_display(key) # calling this to make sure the previous value of display is set
+def remove_file(elem, pattern):
+    if pattern in elem.new[-1]:
+        elem.display.append(False) # manually adding false to the display list
+        elem.new.append(elem.new[-1])
+    else: 
+        files[key].new.append(elem.new[-1])
+        add_previous_display(elem) # calling this to make sure the previous value of display is set
 
-def rename_files():
+def rename_file(elem):
     """Applies all the changes the user has input in loop() to the files
        Once this is called, the changes are final.
     """
-    for elem in files.values():
-        # if the top of the stack display is True
-        if elem.display[-1]:
-            print(f"Renaming {elem.original} to {elem.new[-1]}")
-            old = os.path.join(elem.path, elem.original)
-            new = os.path.join(elem.path, elem.new[-1])
-            os.rename(old, new)
+    # if the top of the stack display is True
+    if elem.display[-1]:
+        print(f"Renaming {elem.original} to {elem.new[-1]}")
+        old = os.path.join(elem.path, elem.original)
+        new = os.path.join(elem.path, elem.new[-1])
+        os.rename(old, new)
     exit()
 
-def cleanup():
+def add_empty_edit(elem):
+    """Appends the last value of new to new
+       This is used to make sure the length of new in file_struct is 
+       always the same between elements
+    """
+    elem.new.append(elem.new[-1])
+
+def addParenthesis(elem):
+    number = ""
+    for c in new:
+        try:
+            n = int(c)
+        except ValueError:
+            number = ""
+    if len(number) == 4:
+        number_with_parenthesis = f"({number})"
+        replace_str(elem, number, number_with_parenthesis)
+    else:
+        add_empty_edit(elem) # to keep the lengths in sync
+
+
+def cleanup(elem):
     """Replaces double spaces with single spaces 5 times
        Removes all periods except extension period
     """
-    replace_str(".", "")
+    addParenthesis()
+    replace_str(".", " ")
     for i in range(5):
         replace_str("  ", " ")
-
+    # TODO make sure an undo() undoes all of this with one call
 
 def get_option(resp):
     """Applies the appropriate action based on the users input in loop()
@@ -210,7 +233,7 @@ def get_option(resp):
         elif len(splt) >= 3:
             new = splt[2]
         old = splt[1]
-        replace_str(old, new)
+        apply_function_all_files(replace_str, old, new)
         
     elif first_arg == "range":
         if len(splt) <= 3:
@@ -222,7 +245,7 @@ def get_option(resp):
             new = splt[4]
         old = splt[3]
         min_r, max_r = splt[1], splt[2]
-        range_replace(min_r, max_r , old, new)
+       apply_function_all_files(range_replace, min_r, max_r , old, new)
 
     elif first_arg == "front":
         if len(splt) < 2:
@@ -233,7 +256,7 @@ def get_option(resp):
         except ValueError:
             print(f"{splt[1]} is not a valid integer argument")
             return
-        remove_from_front(n)
+        apply_function_all_files(remove_from_front, n)
 
     elif first_arg == "mid":
         if len(splt) < 3:
@@ -245,8 +268,7 @@ def get_option(resp):
         except ValueError:
             print("Not valid integer arguments")
             return
-            
-        remove_from_middle(left, right)
+        apply_function_all_files(remove_from_middle, left, right)
 
 
     elif first_arg == "end":
@@ -258,7 +280,7 @@ def get_option(resp):
         except ValueError:
             print(f"{splt[1]} is not a valid integer argument")
             return
-        remove_from_end(n)
+        apply_function_all_files(remove_from_end, n)
 
     elif first_arg == "insert":
         if len(splt) < 3:
@@ -270,13 +292,13 @@ def get_option(resp):
             print("Not valid integer argument")
             return
         text = splt[2]
-        insert_text(position, text)
+        apply_function_all_files(insert_text, position, text)
 
     elif first_arg == "cleanup":
-        cleanup()
+        iapply_function_all_files(cleanup)
 
     elif first_arg == "undo":
-        undo()
+        apply_function_all_files(undo)
     
     elif first_arg == "hide":
         global HIDE
@@ -287,10 +309,10 @@ def get_option(resp):
             print("Not enough arguments given for remove utility")
             return
         pattern = splt[1]
-        remove_files(pattern)
+        apply_function_all_files(remove_files, pattern)
 
     elif first_arg == "rename":
-        rename_files()
+        apply_function_all_files(rename_files)
 
     elif first_arg == "exit":
         exit()

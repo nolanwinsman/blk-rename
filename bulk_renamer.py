@@ -24,7 +24,7 @@ EXTENSIONS = ['.mp4', '.mkv', '.mov', '.avi']
 ALL_FILES = False # boolean for if every file in DIR should be added to dictionary files
 files = {}
 
-
+# If this is true, the user is not shown the availible utilities
 HIDE = False
 
 
@@ -38,12 +38,12 @@ class file_struct():
         self.ext = ext
         self.display = [True]
 
-def apply_function_all_files(fnc, *args)
+def apply_function_all_files(fnc, *args):
     """Loops through all the elements in files{}
        and calls a function on them
     """
     for elem in files.values():
-        fnc(elem, *argv)
+        fnc(elem, *args)
 
 
 def replace_str(elem, old, new):
@@ -74,7 +74,6 @@ def range_replace(elem, min_r, max_r, old, new):
         num = int(re.search(r'\d+', temp).group()) # attempts to find a number
     except Exception as e:
         print(f"Exception {e} occured")
-        continue
 
     if num >= min_r and num <= max_r:
         temp = temp.replace(elem.ext, "") # removes the extension so that the replace will not affect it
@@ -109,7 +108,8 @@ def remove_from_front(elem, n):
     add_new(elem, f"{temp[n:]}{elem.ext}")
 
 def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    return
+    #os.system('cls' if os.name == 'nt' else 'clear')
 
 def print_current():
     """Prints what the files will be renamed to if rename_files() is called
@@ -164,7 +164,7 @@ def remove_file(elem, pattern):
         elem.display.append(False) # manually adding false to the display list
         elem.new.append(elem.new[-1])
     else: 
-        files[key].new.append(elem.new[-1])
+        elem.new.append(elem.new[-1])
         add_previous_display(elem) # calling this to make sure the previous value of display is set
 
 def rename_file(elem):
@@ -186,28 +186,32 @@ def add_empty_edit(elem):
     """
     elem.new.append(elem.new[-1])
 
-def addParenthesis(elem):
+def add_parenthesis(elem):
+    """TODO make this function work
+    """
     number = ""
-    for c in new:
-        try:
-            n = int(c)
-        except ValueError:
+    for c in elem.new[-1]:
+        if c.isdigit():
+            number += c
+        else
             number = ""
+    print(f"NUMBER = {number}")
     if len(number) == 4:
         number_with_parenthesis = f"({number})"
         replace_str(elem, number, number_with_parenthesis)
     else:
         add_empty_edit(elem) # to keep the lengths in sync
 
-
 def cleanup(elem):
     """Replaces double spaces with single spaces 5 times
        Removes all periods except extension period
     """
-    addParenthesis()
-    replace_str(".", " ")
+    apply_function_all_files(replace_str, ".", " ")
     for i in range(5):
-        replace_str("  ", " ")
+        apply_function_all_files(replace_str, "  ", " ")
+    # if there is a four digit number, add parenthesis around it.
+    # this is useful for movie files with the year so Movie 1999.mkv would change to Movie (1999).mkv
+    apply_function_all_files(addParenthesis)
     # TODO make sure an undo() undoes all of this with one call
 
 def get_option(resp):
@@ -245,7 +249,7 @@ def get_option(resp):
             new = splt[4]
         old = splt[3]
         min_r, max_r = splt[1], splt[2]
-       apply_function_all_files(range_replace, min_r, max_r , old, new)
+        apply_function_all_files(range_replace, min_r, max_r , old, new)
 
     elif first_arg == "front":
         if len(splt) < 2:
@@ -295,7 +299,7 @@ def get_option(resp):
         apply_function_all_files(insert_text, position, text)
 
     elif first_arg == "cleanup":
-        iapply_function_all_files(cleanup)
+        apply_function_all_files(cleanup)
 
     elif first_arg == "undo":
         apply_function_all_files(undo)
@@ -309,10 +313,10 @@ def get_option(resp):
             print("Not enough arguments given for remove utility")
             return
         pattern = splt[1]
-        apply_function_all_files(remove_files, pattern)
+        apply_function_all_files(remove_file, pattern)
 
     elif first_arg == "rename":
-        apply_function_all_files(rename_files)
+        apply_function_all_files(rename_file)
 
     elif first_arg == "exit":
         exit()

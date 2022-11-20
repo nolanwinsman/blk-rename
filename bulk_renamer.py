@@ -172,11 +172,12 @@ def rename_file(elem):
     """
     # if the top of the stack display is True
     if elem.display[-1]:
-        print(f"Renaming {elem.original} to {elem.new[-1]}")
         old = os.path.join(elem.path, elem.original)
         new = os.path.join(elem.path, elem.new[-1])
-        os.rename(old, new)
-    exit()
+        # if old == new, no need to rename
+        if old != new:
+            print(f"Renaming {elem.original} to {elem.new[-1]}")
+            os.rename(old, new)
 
 def add_empty_edit(elem):
     """Appends the last value of new to new
@@ -319,6 +320,7 @@ def get_option(resp):
 
     elif first_arg == "rename":
         apply_function_all_files(rename_file)
+        exit()
 
     elif first_arg == "exit":
         exit()

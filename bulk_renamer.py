@@ -45,7 +45,6 @@ def apply_function_all_files(fnc, *args):
     for elem in files.values():
         fnc(elem, *args)
 
-
 def replace_str(elem, old, new):
     """ Replaces the old string with the new string
 
@@ -189,20 +188,23 @@ def add_empty_edit(elem):
 def add_parenthesis(elem):
     """TODO make this function work
     """
-    number = ""
+    print(f"Add Para being called on {elem.new[-1]}")
+    numbers = []
+    temp = ""
     for c in elem.new[-1]:
         if c.isdigit():
-            number += c
-        else
-            number = ""
-    print(f"NUMBER = {number}")
-    if len(number) == 4:
-        number_with_parenthesis = f"({number})"
-        replace_str(elem, number, number_with_parenthesis)
-    else:
-        add_empty_edit(elem) # to keep the lengths in sync
+            temp += c
+        elif not c.isdigit() and len(temp) > 0:
+            numbers.append(temp)
+            temp = ''
+    for num in numbers:
+        # four digit number found
+        if len(num) == 4:
+            replace_str(elem, num, f"({num})")
+            return
+    add_empty_edit(elem)
 
-def cleanup(elem):
+def cleanup():
     """Replaces double spaces with single spaces 5 times
        Removes all periods except extension period
     """
@@ -211,7 +213,7 @@ def cleanup(elem):
         apply_function_all_files(replace_str, "  ", " ")
     # if there is a four digit number, add parenthesis around it.
     # this is useful for movie files with the year so Movie 1999.mkv would change to Movie (1999).mkv
-    apply_function_all_files(addParenthesis)
+    apply_function_all_files(add_parenthesis)
     # TODO make sure an undo() undoes all of this with one call
 
 def get_option(resp):
@@ -299,7 +301,7 @@ def get_option(resp):
         apply_function_all_files(insert_text, position, text)
 
     elif first_arg == "cleanup":
-        apply_function_all_files(cleanup)
+        cleanup()
 
     elif first_arg == "undo":
         apply_function_all_files(undo)
@@ -322,8 +324,6 @@ def get_option(resp):
         exit()
 
     return
-
-
 
 def loop():
     """Loops until the user inputs "exit" or "rename"
@@ -377,7 +377,7 @@ def main():
     # 1st argument is the directory this script works on
     DIR = sys.argv[1]
 
-    # addes files to files{}
+    # adds files to files{}
     for filename in os.listdir(DIR):
         f = os.path.join(DIR, filename)
         # if boolean is True, we are adding every file in DIR

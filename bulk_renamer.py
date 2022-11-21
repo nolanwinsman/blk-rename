@@ -41,10 +41,13 @@ class file_struct():
 def apply_function_all_files(fnc, *args):
     """Loops through all the elements in files{}
        and calls a function on them
+
+       Parameters:
+       fnc -- function that will be called with all elements in files{}
+       *args -- arguments that will be called with function fnc
     """
     for elem in files.values():
         fnc(elem, *args)
-        print(f"{fnc}\ndisplay/new {len(elem.display)} {len(elem.new)}")
 
 def replace_str(elem, old, new):
     """ Replaces the old string with the new string
@@ -132,6 +135,8 @@ def insert_text(elem, position, text):
 def undo(elem):
     """ Redacts the last change the user input in loop()
     """
+
+    # these values should always be equal
     assert len(elem.new) == len(elem.display)
     if len(elem.new) > 1:
         elem.new.pop()
@@ -215,7 +220,6 @@ def cleanup():
     for i in range(5):
         apply_function_all_files(replace_str, "  ", " ")
     # if there is a four digit number, add parenthesis around it.
-    # this is useful for movie files with the year so Movie 1999.mkv would change to Movie (1999).mkv
     apply_function_all_files(add_parenthesis)
 
 def get_option(resp):

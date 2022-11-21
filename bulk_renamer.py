@@ -44,6 +44,7 @@ def apply_function_all_files(fnc, *args):
     """
     for elem in files.values():
         fnc(elem, *args)
+        print(f"{fnc}\ndisplay/new {len(elem.display)} {len(elem.new)}")
 
 def replace_str(elem, old, new):
     """ Replaces the old string with the new string
@@ -184,12 +185,13 @@ def add_empty_edit(elem):
        This is used to make sure the length of new in file_struct is 
        always the same between elements
     """
-    elem.new.append(elem.new[-1])
+    add_new(elem, elem.new[-1])
 
 def add_parenthesis(elem):
-    """TODO make this function work
+    """Adds parenthesis around the first four digit number.
+       This is primarily used for adding parenthesis around a year in a file.
+       For instance Batman 1989.mkv would be changed to Batman (1989).mkv
     """
-    print(f"Add Para being called on {elem.new[-1]}")
     numbers = []
     temp = ""
     for c in elem.new[-1]:
@@ -215,7 +217,6 @@ def cleanup():
     # if there is a four digit number, add parenthesis around it.
     # this is useful for movie files with the year so Movie 1999.mkv would change to Movie (1999).mkv
     apply_function_all_files(add_parenthesis)
-    # TODO make sure an undo() undoes all of this with one call
 
 def get_option(resp):
     """Applies the appropriate action based on the users input in loop()

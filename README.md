@@ -1,6 +1,10 @@
 ### bulk_renamer
 
-Python script to rename multiple files in a folder.
+Python script to rename multiple files in a folder all within the Terminal. 
+
+This script is designed for my particular use case, but others might find it useful.
+
+Currently it there is only the Python version, but I might reprogram this in Rust someday.
 
 
 ## Installation

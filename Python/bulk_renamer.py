@@ -3,7 +3,7 @@ import sys # used for arguments
 import shlex # used to get arguments from input()
 import os # used to clear the screen
 import re # regex
-import readline # including this package allows y
+
 
 # NOTE
 # in .bashrc add
@@ -228,8 +228,17 @@ def get_option(resp):
        Parameter:
        resp -- string of the users input
     """
-
-    splt = shlex.split(resp) # arguments split
+    
+    # checks for no closing quotation
+    try:
+        splt = shlex.split(resp) # arguments split
+    except ValueError as e:
+        if str(e).lower() == "no closing quotation":
+            print("No closing quotation")
+            return
+        else:
+            raise ValueError(f"Unexpected ValueError occured: {e}")
+        
     if len(splt) < 1:
         print("Not enough arguments given")
         return
